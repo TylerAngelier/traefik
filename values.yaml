@@ -1,0 +1,53 @@
+#
+# Configure the deployment
+#
+deployment:
+  # Number of pods of the deployment (only applies when kind == Deployment)
+  replicas: 4
+  # Pod disruption budget
+  podDisruptionBudget:
+    enabled: true
+    minAvailable: 3
+
+service:
+  type: NodePort
+  ports:
+    - name: web
+      containerPort: 8000
+      nodePort: 32298
+    - name: websecure
+      containerPort: 4443
+      nodePort: 31514
+    - name: admin
+      containerPort: 8080
+
+# Pod disruption budget
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 4
+
+# # Create an IngressRoute for the dashboard
+# ingressRoute:
+#   dashboard:
+#     enabled: false
+
+## Create HorizontalPodAutoscaler object.
+##
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 80
+
+pilot:
+  enabled: true
+  token: "$PILOT_TOKEN"
+  dashboard: true
